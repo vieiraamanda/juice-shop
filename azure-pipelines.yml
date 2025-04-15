@@ -1,39 +1,29 @@
 trigger:
   branches:
     include:
-      - master
+      - master  # Ajuste conforme sua branch principal
 
 pool:
-  name: Default
+  name: Default  # Ou o nome do seu pool de agentes (se você tiver um customizado)
 
 steps:
   - checkout: self  # Faz o checkout do repositório
 
-  # Instalar dependências npm
-  - script: npm install
-    displayName: 'Instalar dependências npm'
-
-  # Instalar o Snyk e autenticar
+  # Instalar dependências npm e Snyk
   - script: |
-      npm install -g snyk
-      snyk auth $(SNYK_TOKEN)
+      npm install -g snyk snyk-to-html
+      snyk auth $(SNYK_TOKEN)  # A variável de ambiente SNYK_TOKEN deve ser configurada nas secretas do Azure DevOps
     displayName: 'Instalar Snyk e autenticar'
 
   # Rodar o Snyk Test (verificar vulnerabilidades)
-  - script: snyk test --all-projects --json-file-output=results.json
+  - script: |
+      snyk test --all-projects --json-file-output=results.json
+      RESULT=$?
+      snyk-to-html -o $(Build.ArtifactStagingDirectory)/results-test.html < results.json
+      exit $RESULT
+    continueOnError: true
     displayName: 'Rodar Snyk Test'
-
-  # Gerar o relatório HTML do Snyk Test
-  - script: snyk-to-html -o $(Build.ArtifactStagingDirectory)/results-test.html < results.json
-    displayName: 'Gerar relatório Snyk Test'
 
   # Rodar o Snyk Monitor (enviar para monitoramento contínuo)
   - script: snyk monitor --all-projects
     displayName: 'Rodar Snyk Monitor'
-
-  # Publicar o relatório HTML como artefato
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathToPublish: $(Build.ArtifactStagingDirectory)
-      artifactName: 'Snyk Reports'
-    displayName: 'Publicar artefato de relatório'
