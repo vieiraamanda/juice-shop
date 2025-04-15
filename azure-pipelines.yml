@@ -15,11 +15,15 @@ steps:
     displayName: 'snyk code'
 
   # snyk open source
-  - script: npm i snyk test --org=nova8-cybersecurity-nfr-default
+  - script: |
+      npm install
+      snyk test --org=nova8-cybersecurity-nfr-default
     continueOnError: true
     displayName: 'snyk test'
   
   # snyk monitor
-  - script: npm i snyk monitor --org=nova8-cybersecurity-nfr-default
+  - script: |
+      npm install
+      snyk monitor --org=nova8-cybersecurity-nfr-default
     continueOnError: true
     displayName: 'snyk monitor'
