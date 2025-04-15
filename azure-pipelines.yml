@@ -1,48 +1,21 @@
-trigger:
-  - master
-
 pool:
   name: Default
 
 steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: '20.x'
-    displayName: 'Install Node.js'
+  - checkout: self
 
+  # install & prepare snyk
   - script: |
-      npm install -g snyk snyk-to-html
-    displayName: 'Install Snyk and snyk-to-html'
-
-  - script: |
-      if [ -z "$(SNYK_TOKEN)" ]; then
-        echo "❌ SNYK_TOKEN is not set!"
-        exit 1
-      fi
-
-      snyk config set endpoint=https://api.us.snyk.io
+      npm install --location=global snyk
       snyk auth $(SNYK_TOKEN)
+    displayName: 'snyk install & auth'
 
-      echo "✅ Autenticado com sucesso. Iniciando monitoramento..."
+  # snyk code
+  - script: snyk code test --org=nova8-cybersecurity-nfr-default
+    continueOnError: true
+    displayName: 'snyk code'
 
-      snyk monitor --all-projects
-
-      echo "✅ Monitoramento feito. Executando o teste..."
-
-      snyk test --all-projects --json | snyk-to-html -o results.html
-    env:
-      SNYK_TOKEN: $(SNYK_TOKEN)
-    displayName: 'Run Snyk monitor and test'
-
-  - task: CopyFiles@2
-    inputs:
-      SourceFolder: '$(Build.SourcesDirectory)'
-      Contents: 'results.html'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    displayName: 'Copy results.html to staging directory'
-
-  - task: PublishBuildArtifacts@1
-    inputs:
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      ArtifactName: 'snyk-results'
-    displayName: 'Publish snyk report artifact'
+  # snyk open source
+  - script: snyk test --all-projects --org=nova8-cybersecurity-nfr-default
+    continueOnError: true
+    displayName: 'snyk open source'
