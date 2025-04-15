@@ -14,8 +14,9 @@ steps:
       npm install -g snyk
       snyk config set endpoint=https://api.us.snyk.io
       snyk auth $(SNYK_TOKEN)
+      snyk code test
       snyk test --all-projects
-      snyk-monitor --all-projects
+      snyk monitor --all-projects
 
     env:
       SNYK_TOKEN: $(SNYK_TOKEN)
