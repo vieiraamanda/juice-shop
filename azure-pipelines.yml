@@ -2,7 +2,7 @@ trigger:
   - main  # ou sua branch principal
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: LAPTOP-KQQJGSRF
 
 variables:
   SNYK_TOKEN: $(snykToken)  # variável definida nas variáveis do pipeline
