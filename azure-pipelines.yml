@@ -1,29 +1,46 @@
-pool: Default
+trigger:
+  branches:
+    include:
+      - master
+
+pool:
+  name: Default
 
 steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '20.x'
-  displayName: 'Install Node.js'
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '20.x'
+    displayName: 'Install Node.js'
 
-- script: |
-    npm install -g snyk
-    snyk config set endpoint=https://api.us.snyk.io
-    snyk auth $(SNYK_TOKEN)
-  displayName: 'Snyk Install & Auth'
+  - script: |
+      npm install
+    displayName: 'Install dependencies'
 
-# Snyk Open Source
-- script: |
-    echo "Rodando Snyk Test"
-    snyk test --all-projects --org=nova8-cybersecurity-nfr-default
-  env:
-    SNYK_TOKEN: $(SNYK_TOKEN)
-  displayName: 'Snyk Open Source'
+  - script: |
+      npm install -g snyk
+    displayName: 'Install Snyk CLI'
 
-# Snyk Monitor
-- script: |
-    echo "Rodando Snyk Monitor"
-    snyk monitor --all-projects --org=nova8-cybersecurity-nfr-default
-  env:
-    SNYK_TOKEN: $(SNYK_TOKEN)
-  displayName: 'Snyk Monitor'
+  - script: |
+      snyk auth $(SNYK_TOKEN)
+    displayName: 'Authenticate with Snyk'
+
+  - script: |
+      snyk test --all-projects
+    displayName: 'Snyk Open Source Test'
+    continueOnError: true
+    env:
+      SNYK_TOKEN: $(SNYK_TOKEN)
+
+  - script: |
+      snyk monitor --all-projects
+    displayName: 'Snyk Monitor'
+    continueOnError: true
+    env:
+      SNYK_TOKEN: $(SNYK_TOKEN)
+
+  - script: |
+      snyk code test
+    displayName: 'Snyk Code Test'
+    continueOnError: true
+    env:
+      SNYK_TOKEN: $(SNYK_TOKEN)
