@@ -16,6 +16,11 @@ steps:
     displayName: 'snyk code'
 
   # snyk open source
-  - script: snyk test --all-projects --org=nova8-cybersecurity-nfr-default
+  - script: snyk test --org=nova8-cybersecurity-nfr-default
     continueOnError: true
-    displayName: 'snyk open source'
+    displayName: 'snyk test'
+  
+  # snyk monitor
+  - script: snyk monitor --org=nova8-cybersecurity-nfr-default
+    continueOnError: true
+    displayName: 'snyk monitor'
