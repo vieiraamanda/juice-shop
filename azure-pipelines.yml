@@ -1,0 +1,34 @@
+trigger:
+  - main  # ou sua branch principal
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  SNYK_TOKEN: $(snykToken)  # variável definida nas variáveis do pipeline
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '18.x'
+    displayName: 'Instala Node.js'
+
+  - script: |
+      npm install -g snyk
+    displayName: 'Instala Snyk CLI'
+
+  - script: |
+      npm install
+    displayName: 'Instala dependências do projeto'
+
+  - script: |
+      snyk auth $(SNYK_TOKEN)
+    displayName: 'Autentica no Snyk'
+
+  - script: |
+      snyk test
+    displayName: 'Executa snyk test'
+
+  - script: |
+      snyk monitor
+    displayName: 'Executa snyk monitor'
