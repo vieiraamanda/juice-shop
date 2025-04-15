@@ -17,22 +17,18 @@ steps:
 
   # snyk open source
   - script: |
-      echo "Iniciando instalação das dependências"
-      npm install  # Instala as dependências
-      ls -la node_modules  # Verifica se o node_modules foi criado
+      echo "Iniciando instalação das dependências"o
       npm install -g snyk  # Instala o Snyk globalmente
       snyk --version  # Verifica se o Snyk está instalado corretamente
-      snyk test --all-projects --org=nova8-cybersecurity-nfr-default  # Roda o scan
+      snyk test --org=nova8-cybersecurity-nfr-default  # Roda o scan
     continueOnError: true
     displayName: 'snyk test'
   
   # snyk monitor
   - script: |
       echo "Iniciando instalação das dependências"
-      npm install  # Instala as dependências
-      ls -la node_modules  # Verifica se o node_modules foi criado
       npm install -g snyk  # Instala o Snyk globalmente
       snyk --version  # Verifica se o Snyk está instalado corretamente
-      snyk monitor --all-projects --org=nova8-cybersecurity-nfr-default  # Executa o monitoramento
+      snyk monitor --org=nova8-cybersecurity-nfr-default  # Executa o monitoramento
     continueOnError: true
     displayName: 'snyk monitor'
