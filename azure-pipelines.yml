@@ -16,19 +16,11 @@ steps:
     displayName: 'snyk code'
 
   # snyk open source
-  - script: |
-      echo "Iniciando instalação das dependências"
-      npm install -g snyk
-      snyk --version
-      snyk test --org=nova8-cybersecurity-nfr-default
+  - script: npm install -g snyk && snyk test --org=nova8-cybersecurity-nfr-default
     continueOnError: true
     displayName: 'snyk test'
   
   # snyk monitor
-  - script: |
-      echo "Iniciando instalação das dependências"
-      npm install -g snyk
-      snyk --version
-      snyk monitor --org=nova8-cybersecurity-nfr-default
+  - script: npm install -g snyk && snyk monitor --org=nova8-cybersecurity-nfr-default
     continueOnError: true
     displayName: 'snyk monitor'
