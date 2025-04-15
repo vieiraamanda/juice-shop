@@ -12,12 +12,11 @@ steps:
 
   - script: |
       npm install -g snyk
-    displayName: 'NPM Install'
-
-  - script: |
       snyk config set endpoint=https://api.us.snyk.io
       snyk auth $(SNYK_TOKEN)
-      snyk monitor
+      snyk test --all-projects
+      snyk-monitor --all-projects
+
     env:
       SNYK_TOKEN: $(SNYK_TOKEN)
     displayName: 'Run Snyk test'
