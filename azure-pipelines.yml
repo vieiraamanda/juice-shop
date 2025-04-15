@@ -2,7 +2,7 @@ trigger:
   - main  # ou sua branch principal
 
 pool:
-  name: 'LAPTOP-KQQJGSRF'
+  name: 'Default'
 
 variables:
   SNYK_TOKEN: $(snykToken)  # variável definida nas variáveis do pipeline
