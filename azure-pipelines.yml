@@ -1,34 +1,39 @@
 trigger:
-  - main  # ou sua branch principal
+  branches:
+    include:
+      - master
 
 pool:
-  name: 'Default'
-
-variables:
-  SNYK_TOKEN: $(snykToken)  # variável definida nas variáveis do pipeline
+  name: Default
 
 steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: '18.x'
-    displayName: 'Instala Node.js'
+  - checkout: self  # Faz o checkout do repositório
 
+  # Instalar dependências npm
+  - script: npm install
+    displayName: 'Instalar dependências npm'
+
+  # Instalar o Snyk e autenticar
   - script: |
       npm install -g snyk
-    displayName: 'Instala Snyk CLI'
-
-  - script: |
-      npm install
-    displayName: 'Instala dependências do projeto'
-
-  - script: |
       snyk auth $(SNYK_TOKEN)
-    displayName: 'Autentica no Snyk'
+    displayName: 'Instalar Snyk e autenticar'
 
-  - script: |
-      snyk test
-    displayName: 'Executa snyk test'
+  # Rodar o Snyk Test (verificar vulnerabilidades)
+  - script: snyk test --all-projects --json-file-output=results.json
+    displayName: 'Rodar Snyk Test'
 
-  - script: |
-      snyk monitor
-    displayName: 'Executa snyk monitor'
+  # Gerar o relatório HTML do Snyk Test
+  - script: snyk-to-html -o $(Build.ArtifactStagingDirectory)/results-test.html < results.json
+    displayName: 'Gerar relatório Snyk Test'
+
+  # Rodar o Snyk Monitor (enviar para monitoramento contínuo)
+  - script: snyk monitor --all-projects
+    displayName: 'Rodar Snyk Monitor'
+
+  # Publicar o relatório HTML como artefato
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: 'Snyk Reports'
+    displayName: 'Publicar artefato de relatório'
