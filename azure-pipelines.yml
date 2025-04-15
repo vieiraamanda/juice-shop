@@ -1,29 +1,35 @@
-trigger:
-  branches:
-    include:
-      - master  # Ajuste conforme sua branch principal
+# Runs 4 Snyk Products (Code, Open Source, Container, IaC)
+# Outputs the results to the pipeline
 
-pool:
-  name: Default  # Ou o nome do seu pool de agentes (se você tiver um customizado)
+# Prerequisites:
+# - Set a SNYK_TOKEN in the pipelines secrets
+# - Install the HTML viewer extension
+#   https://marketplace.visualstudio.com/items?itemName=JakubRumpca.azure-pipelines-html-report
+
+# NOTE: Change this to a different pool to run the scripts.
+pool: Default
 
 steps:
-  - checkout: self  # Faz o checkout do repositório
+  - checkout: self
 
-  # Instalar dependências npm e Snyk
-  - script: |
-      npm install -g snyk snyk-to-html
-      snyk auth $(SNYK_TOKEN)  # A variável de ambiente SNYK_TOKEN deve ser configurada nas secretas do Azure DevOps
-    displayName: 'Instalar Snyk e autenticar'
+  # .. your instructions on building the app or preparing the repository
 
-  # Rodar o Snyk Test (verificar vulnerabilidades)
+  # install & prepare snyk
   - script: |
-      snyk test --all-projects --json-file-output=results.json
-      RESULT=$?
-      snyk-to-html -o $(Build.ArtifactStagingDirectory)/results-test.html < results.json
-      exit $RESULT
+      npm install -g snyk
+      snyk auth $(SNYK_TOKEN)
+
+    displayName: 'snyk install & auth'
+
+  # snyk test
+  - script: |
+      snyk test --all-projects --org=nova8-cybersecurity-nfr-default
     continueOnError: true
-    displayName: 'Rodar Snyk Test'
+    displayName: 'snyk test'
 
-  # Rodar o Snyk Monitor (enviar para monitoramento contínuo)
-  - script: snyk monitor --all-projects
-    displayName: 'Rodar Snyk Monitor'
+ # snyk monitor
+  - script: |
+      snyk monitor --all-projects --org=nova8-cybersecurity-nfr-default
+    continueOnError: true
+    displayName: 'snyk monitor'
+  
