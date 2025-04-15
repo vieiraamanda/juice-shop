@@ -1,35 +1,24 @@
-# Runs 4 Snyk Products (Code, Open Source, Container, IaC)
-# Outputs the results to the pipeline
-
-# Prerequisites:
-# - Set a SNYK_TOKEN in the pipelines secrets
-# - Install the HTML viewer extension
-#   https://marketplace.visualstudio.com/items?itemName=JakubRumpca.azure-pipelines-html-report
-
-# NOTE: Change this to a different pool to run the scripts.
 pool: Default
 
 steps:
-  - checkout: self
+- task: NodeTool@0
+  inputs:
+    versionSpec: '20.x'
+  displayName: 'Insall Node.js'
 
-  # .. your instructions on building the app or preparing the repository
+- script: 
 
-  # install & prepare snyk
-  - script: |
-      npm install -g snyk
-      snyk auth $(SNYK_TOKEN)
+    npm install
 
-    displayName: 'snyk install & auth'
+    snyk config set endpoint=https://api.us.snyk.io
+    snyk auth $SNYK_TOKEN
 
-  # snyk test
-  - script: |
-      snyk test --all-projects --org=nova8-cybersecurity-nfr-default
-    continueOnError: true
-    displayName: 'snyk test'
+    echo "Rodando Snyk Test"
+    snyk test --all-projects --org=nova8-cybersecurity-nfr-default
 
- # snyk monitor
-  - script: |
-      snyk monitor --all-projects --org=nova8-cybersecurity-nfr-default
-    continueOnError: true
-    displayName: 'snyk monitor'
+    echo "Rodando Snyk Monitor"
+    snyk monitor --all-projects --org=nova8-cybersecurity-nfr-default
   
+  env:
+    SNYK_TOKEN: $(SNYK_TOKEN)
+  displayName: 'Security Scan + Monitoramento'
