@@ -6,7 +6,7 @@ steps:
 
   # install & prepare snyk
   - script: |
-      npm i -g snyk
+      npm install --location=global snyk
       snyk auth $(SNYK_TOKEN)
     displayName: 'snyk auth'
 
@@ -16,11 +16,11 @@ steps:
     displayName: 'snyk code'
 
   # snyk open source
-  - script: npm install -g snyk && snyk test --org=nova8-cybersecurity-nfr-default
+  - script: snyk test --all-projects --org=nova8-cybersecurity-nfr-default
     continueOnError: true
     displayName: 'snyk test'
   
   # snyk monitor
-  - script: npm install -g snyk && snyk monitor --org=nova8-cybersecurity-nfr-default
+  - script: snyk monitor --all-projects --org=nova8-cybersecurity-nfr-default
     continueOnError: true
     displayName: 'snyk monitor'
