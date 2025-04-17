@@ -7,6 +7,7 @@ steps:
   # install & prepare snyk
   - script: |
       npm install --location=global snyk
+      snyk config set endpoint=https://api.us.snyk.io
       snyk auth $(SNYK_TOKEN)
     displayName: 'snyk auth'
 
