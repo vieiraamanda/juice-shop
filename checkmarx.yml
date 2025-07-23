@@ -1,0 +1,6 @@
+- task: Checkmarx AST@3
+  inputs:
+    CheckmarxService: 'Checkmarx'
+    projectName: 'juice-shop'
+    branchName: 'master'
+    tenantName: 'natura'
