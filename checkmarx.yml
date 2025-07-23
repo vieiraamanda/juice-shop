@@ -22,3 +22,4 @@ stages:
               projectName: 'juice-shop'
               branchName: 'master'
               tenantName: 'natura'
+              additionalParams: '--scan-types SAST, --sast-filter !*.js'
