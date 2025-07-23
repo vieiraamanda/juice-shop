@@ -1,6 +1,24 @@
-- task: Checkmarx AST@3
-  inputs:
-    CheckmarxService: 'Checkmarx'
-    projectName: 'juice-shop'
-    branchName: 'master'
-    tenantName: 'natura'
+trigger:
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+  - stage: SecurityScan
+    displayName: 'Checkmarx AST Scan'
+    jobs:
+      - job: RunCheckmarxScan
+        displayName: 'Executar Checkmarx AST'
+        steps:
+          - checkout: self
+
+          - task: Checkmarx AST@3
+            displayName: 'Executar análise com Checkmarx AST'
+            inputs:
+              CheckmarxService: 'Checkmarx'
+              projectName: 'juice-shop'
+              branchName: 'master'
+              tenantName: 'natura'
